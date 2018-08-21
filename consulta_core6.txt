@@ -1,0 +1,1445 @@
+﻿---------------------------------------------------
+--ASP.NET CORE 1.0 ASPNET5 MVC6
+---------------------------------------------------
+----------------
+Dapper-dot
+----------------
+
+
+WEB API
+https://docs.asp.net/en/latest/tutorials/first-web-api.html
+
+
+https://www.getpostman.com/
+--Construtor de API
+
+
+--ASP.NET Core Web Application (.NET Core)
+
+----------------------------------------- 
+namespace TodoApi.Models
+{
+    public class TodoItem
+    {
+        public string Key { get; set; }
+        public string Name { get; set; }
+        public bool IsComplete { get; set; }
+
+    }
+}
+
+----------------------------------------- 
+This interface defines basic CRUD operations.
+
+namespace TodoApi.Models
+{
+    interface ITodoRepository
+    {
+        void Add(TodoItem item);
+        IEnumerable<TodoItem> GetAll();
+        TodoItem Find(string key);
+        TodoItem Remove(string key);
+        void Update(TodoItem item);
+    }
+}
+
+
+----------------------------------------- 
+
+namespace TodoApi.Models
+{
+    public class TodoRepository : ITodoRepository
+    {
+        private static ConcurrentDictionary<string, TodoItem> _todos =
+              new ConcurrentDictionary<string, TodoItem>();
+
+        public TodoRepository()
+        {
+            Add(new TodoItem { Name = "Item1" });
+        }
+
+        public IEnumerable<TodoItem> GetAll()
+        {
+            return _todos.Values;
+        }
+
+        public void Add(TodoItem item)
+        {
+            item.Key = Guid.NewGuid().ToString();
+            _todos[item.Key] = item;
+        }
+
+        public TodoItem Find(string key)
+        {
+            TodoItem item;
+            _todos.TryGetValue(key, out item);
+            return item;
+        }
+
+        public TodoItem Remove(string key)
+        {
+            TodoItem item;
+            _todos.TryRemove(key, out item);
+            return item;
+        }
+
+        public void Update(TodoItem item)
+        {
+            _todos[item.Key] = item;
+        }
+    }
+    //
+
+}
+
+----------------------------------------- 
+
+
+http://localhost:49843/api/todo
+
+[{
+  "key":"df5ffa26-84e4-4162-bb91-79d26b872480",
+  "name":"Item1",
+  "isComplete":false 
+}]
+
+
+dotnet run
+GET /api/todo
+
+
+
+CRUD
+---------------------------------------
+Here is the API that you’ll create:
+---------------------------------------
+        API	                     Description	            Request body	 Response body
+R       GET/api/todo	         Get all to-do items	    None	         Array of to-do items
+R       GET/api/todo/{id}	     Get an item by ID	        None	         To-do item
+C       POST/api/todo	         Add a new item	            To-do item	     To-do item
+U       PUT/api/todo/{id}	     Update an existing item	To-do item	     None
+U       PATCH/api/todo/{id}	     Update an existing item	To-do item	     None
+D       DELETE/api/todo/{id}	 Delete an item.	        None	         None
+--
+------------------------------------------------------------------------------------------
+--
+
+
+Request starting 
+HTTP/1.1 GET http://localhost:49843/api/todo 
+
+
+--Consumo REST
+https://www.asp.net/web-api/overview/advanced/calling-a-web-api-from-a-net-client
+
+
+
+
+//---------------------------------------------------------------------------------
+
+
+
+Application Insights Telemetry (unconfigured): 
+{"name":"Microsoft.ApplicationInsights.Dev.Request","time":"2016-11-09T16:35:10.2244879Z","tags":
+{"ai.operation.id":"ERYnLY22Gog=","ai.operation.name":"GET Values/Get",
+"ai.user.userAgent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36",
+"ai.device.roleInstance":"saowkssv158","ai.internal.sdkVersion":"aspnet5c:1.0.0"},
+"data":{"baseType":"RequestData","baseData":{"ver":2,"id":"ERYnLY22Gog=","name":
+"GET Values/Get","startTime":"2016-11-09T16:35:10.2244879+00:00","duration":
+"00:00:00.5530495","success":true,"responseCode":"200",
+"url":"http://localhost:49843/api/values","httpMethod":
+"GET","properties":{"DeveloperMode":"true"}}}}
+
+
+
+//----------------------------------
+
+http://localhost:49843/api/teste/GetList?id=7&name=jose
+http://localhost:49843/api/teste/GetList?id=8&name=maria
+--
+http://localhost:49843/api/teste/GetList2?id=2&name=ma
+
+
+
+
+--Rota parametros
+https://damienbod.com/2014/08/22/web-api-2-exploring-parameter-binding/
+
+// http://localhost:49407/api/values/example3/2/3/4
+[Route("example3/{id1}/{id2}/{id3}")]
+[HttpGet]
+public string GetWith3ParametersAttributeRouting(int id1, long id2, double id3)
+{
+   return "value";
+}
+
+
+
+http://localhost:49843/api/teste/lista/4/mar
+[Route("lista/{id}/{name}")]
+//GET api/teste/lista/5/name
+
+
+
+//WEB API async
+https://msdn.microsoft.com/en-us/magazine/mt767699.aspx
+
+
+
+http://localhost:49843/api/teste/lista
+
+
+
+
+-------------------------------------------------------------------
+//WEB API - chamando procedures por EF
+// 
+https://code.msdn.microsoft.com/MVC-Angular-JS-CRUD-using-b4845edc
+
+
+
+Introduction
+In web there are lots of examples relatedto WEB API using Entity Framework. But in community forum I saw many questions
+was been asked by members for a simple example using WEB API Entity Framework with Stored Procedure. 
+I search a lot to find a simple Article which explains a simple way to perform CRUD operation using Stored Procedure with MVC and Web API.
+But I couldn’t able to find any article which explains all this .I plan to makea simple web application using MVC 5 ,Angular JS ,
+WEB API to perform CRUD(Create/Read/Update and Delete) using Entity Framework using Stored procedure.
+
+In this article we will see how to
+C->(Create - Insert New Student Details to database using EF and WEB API with Stored Procedure)
+R->(Read – Search/Select Student Details from database using EF and WEB API with Stored Procedure)
+U->(Update - Update Student Details to database using EF and WEB API with Stored Procedure)
+D->(Delete - Delete Student Details from database using EF and WEB API with Stored Procedure)
+
+
+
+
+
+--WEB API - Calling Stored Procs in your LightSwitch Databases using Web API
+https://blogs.msdn.microsoft.com/bethmassi/2013/07/25/adding-stored-procs-to-your-lightswitch-intrinsic-database/
+
+
+
+
+--Migração:
+Migrating from ASP.NET 5 RC1 to ASP.NET Core 1.0
+https://docs.asp.net/en/latest/migration/rc1-to-rtm.html
+
+
+
+Namespace and package ID changes
+
+ASP.NET 5 has been renamed to ASP.NET Core 1.0
+ASP.NET MVC and Identity are now part of ASP.NET Core
+ASP.NET MVC 6 is now ASP.NET Core MVC
+ASP.NET Identity 3 is now ASP.NET Core Identity
+ASP.NET Core 1.0 package versions are 1.0.0
+ASP.NET Core 1.0 tool package versions are 1.0.0-preview2-final
+
+
+ASP.NET 5 RC1	                            ASP.NET Core 1.0
+EntityFramework.MicrosoftSqlServer	        Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.AspNet.Diagnostics.Entity	        Microsoft.AspNetCore.Dianostics.EntityFrameworkCore
+Microsoft.AspNet.Identity.EntityFramework	Microsoft.AspNetCore.Identity.EntityFrameworkCore
+Microsoft.AspNet.Tooling.Razor	            Microsoft.AspNetCore.Razor.Tools
+
+
+
+--
+Publishing to IIS
+IIS publishing is now provided by the publish-iis tool in the Microsoft.AspNetCore.Server.IISIntegration.Tools package. 
+If you intend to run your app behind IIS, add the publish-iis tool to your project.json:
+{
+  "tools": {
+    "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.0.0-preview2-final"
+  }
+}
+
+{
+  "tools": {
+    "Microsoft.EntityFrameworkCore.Tools": "1.0.0-preview2-final"
+  }
+}
+
+
+
+ASP.NET 5 RC1	        ASP.NET Core 1.0
+IWebApplicationBuilder	IWebHostBuilder
+WebApplicationBuilder	WebHostBuilder
+IWebApplication	        IWebHost
+WebApplication	        WebHost
+WebApplicationOptions	WebHostOptions
+WebApplicationDefaults	WebHostDefaults
+WebApplicationService	WebHostService
+WebApplicationConfiguration	WebHostConfiguration
+
+
+
+Server garbage collection (GC)
+
+You must turn on server garbage collection in project.json or app.config when running ASP.NET projects on the full .NET Framework:
+
+ {
+   "runtimeOptions": {
+     "configProperties": {
+       "System.GC.Server": true
+     }
+   }
+ }
+ 
+ 
+
+ 
+ 
+--
+--------------------------------------------------------------------------------
+--
+Dapper 
+https://github.com/StackExchange/dapper-dot-net
+Site oficial
+
+
+
+
+
+
+---------------------------------------------------------
+--
+--Dapper and Repository Pattern in Web API
+https://code.msdn.microsoft.com/Dapper-and-Repository-68710cd7
+--
+
+
+
+This article will demonstrate about how to get data using Dapper and Repository Pattern in Web API and how to use 
+Dependency Injection using Unit of Work in Web API. I will show you how to 
+implement Generic Repository with Custom Repository for CRUD operations.
+
+
+
+
+1-Instalar o pacote:
+Install-Package Dapper
+
+
+Retrieving package 'Dapper 1.50.2' from 'nuget.org'.
+  GET https://www.nuget.org/api/v2/Packages(Id='Dapper',Version='1.50.2')
+  OK https://www.nuget.org/api/v2/Packages(Id='Dapper',Version='1.50.2') 170ms
+
+Installing NuGet package Dapper.1.50.2.
+Successfully installed 'Dapper 1.50.2' to DapperWebAPI
+
+
+--String de Conexão
+https://docs.asp.net/en/latest/fundamentals/configuration.html
+
+appsettings.json file:
+
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=aspnet-WebApplication1-26e8893e-d7c0-4fc6-8aab-29b59971d622;Trusted_Connection=True;MultipleActiveResultSets=true"
+  },
+  "Logging": {
+    "IncludeScopes": false,
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
+    }
+  }
+}
+
+
+
+
+
+
+--Teste
+------------------------------
+meu computador:
+saowkssv158.redfactor.com.br
+
+
+
+
+<ArrayOfBlog xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/DataAccess.Entities">
+<Blog>
+	<Categories i:nil="true"/>
+	<CategoryId>1</CategoryId>
+	<FullPostContent>teste</FullPostContent>
+	<IsCommented>true</IsCommented>
+	<IsPrivate>true</IsPrivate>
+	<IsShared>true</IsShared>
+	<MetaDescription>1</MetaDescription>
+	<MetaKeywords>1</MetaKeywords>
+	<NumberOfViews>1</NumberOfViews>
+	<PostAddedDate>2016-01-01T00:00:00</PostAddedDate>
+	<PostId>1</PostId>
+	<PostTitle>teste</PostTitle>
+	<PostUpdatedDate>2016-01-01T00:00:00</PostUpdatedDate>
+	<PostUrl>teste</PostUrl>
+	<ShortPostContent>teste</ShortPostContent>
+</Blog>
+<Blog>
+	<Categories i:nil="true"/>
+	<CategoryId>2</CategoryId>
+	<FullPostContent>teste 2</FullPostContent>
+	<IsCommented>false</IsCommented>
+	<IsPrivate>false</IsPrivate>
+	<IsShared>false</IsShared>
+	<MetaDescription>2</MetaDescription>
+	<MetaKeywords>2</MetaKeywords>
+	<NumberOfViews>2</NumberOfViews>
+	<PostAddedDate>2016-01-01T00:00:00</PostAddedDate>
+	<PostId>2</PostId>
+	<PostTitle>teste 2</PostTitle>
+	<PostUpdatedDate>2016-01-01T00:00:00</PostUpdatedDate>
+	<PostUrl>teste 2</PostUrl>
+	<ShortPostContent>teste 2</ShortPostContent>
+</Blog>
+</ArrayOfBlog>
+
+
+
+
+----------------
+
+        public IEnumerable<dynamic> GetResultById(string id)
+        {
+            using (var conn = new SqlConnection(@"Server=localhost\sqlexpress;Database=XmlTest;Trusted_Connection=True"))
+            {
+                var rows = conn.Query("select id,name FROM people WHERE Id=@Id", new { Id = id });
+
+                return rows;
+            }
+        }
+
+
+--------------------------------
+
+
+	public int PostId { get; set; }
+	public string PostTitle { get; set; }
+	public string ShortPostContent { get; set; }
+	public string FullPostContent { get; set; }
+	public string MetaKeywords { get; set; }
+	public string MetaDescription { get; set; }
+	public string PostAddedDate { get; set; }
+	public date PostUpdatedDate { get; set; }
+	public boolean IsCommented { get; set; }
+	public boolean IsShared { get; set; }
+	public boolean IsPrivate { get; set; }
+	public int NumberOfViews { get; set; }
+	public string PostUrl { get; set; }
+	public int CategoryId { get; set; }
+
+	ALTER PROC [dbo].[usp_GetAllBlogPostByPageIndex](@PageIndex Int, @PageSize INT)
+	
+	
+-----------------------------------------
+
+
+--AREAS
+https://msdn.microsoft.com/pt-br/library/dn877998.aspx
+
+Como Usar Areas no ASP.NET MVC 5?
+
+Criar uma Área
+Como explicado anteriormente, uma área é uma estrutura lógica do projeto, portanto, 
+no Solution Explorer, clique com o botão direito no nome do projeto e selecione Add / Area. 
+Conforme a figura 4, é aberta uma janela para informar o nome da Área, neste caso, Admin.
+
+
+https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/areas
+
+Areas
+
+
+--Criando Areas no MVC6
+http://timjames.me/blog/2014/12/13/mvc-areas-with-vnext/
+
+Areas->SeuNome/Controller/
+
+
+Your new route will 
+work exactly the same as the “default” route with the addition of the area. 
+So if you now create an Index view for your HomeController 
+and navigate to /MyArea/Home or /MyArea/Home/Index you will see your index view.
+
+
+
+
+--
+-----------------------------
+--
+task -> Método assíncrono
+--
+Versionamento
+--
+
+
+
+
+
+
+
+
+
+
+
+http://imasters.com.br/linguagens/asp/como-usar-areas-asp-net-mvc-5/?trace=1519021197&source=single
+
+
+--
+----------------------
+--
+
+
+
+http://shashangka.com/2016/01/30/asp-net-mvc5-routing-with-web-api2-area/
+
+context.MapRoute(
+    "AreaName_default",
+    "AreaName/{controller}/{action}/{id}",
+    new { action = "Index", id = UrlParameter.Optional }
+);
+If you want to have Web API controllers inside this area, you must add the Web API route before this one, like so:
+
+context.Routes.MapHttpRoute("AreaName_WebApiRoute",
+    "AreaName/Api/{controller}/{id}",
+    new { id = RouteParameter.Optional });
+In this case, I'm assuming that you want to invoke your API controllers using an url like this: /AreaName/Api/ControllerName/Id.
+
+
+
+---------------------------------------------
+--ConnectionString: Dapper
+
+https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration
+
+http://stackoverflow.com/questions/37597300/net-core-dapper-connection-string
+
+
+
+--Solução aqui Bom site
+http://techbrij.com/asp-net-core-postgresql-dapper-crud
+ASP.NET Core 1.0 with PostgreSQL and Dapper – CRUD Operations Example
+
+
+---------------------------------------------------------------------------------------
+API REST boas práticas
+
+http://www.matera.com/br/2016/01/21/boas-praticas-para-desenvolvimento-de-apis-rest/
+
+
+“meudominioxpto.com”:
+
+/cliente
+/produto
+/pedido
+
+E como lidar com relações? Por exemplo, o telefone de um cliente.
+
+/cliente/33/ telefone – manipular os telefones do cliente 33;
+/cliente/33/ telefone/10 – manipular os telefones 10 do cliente 33.
+
+
+
+--
+----------------------------------------------------
+--Bom site de boas práticas
+http://blog.octo.com/pt-br/projetando-uma-api-rest/
+
+
+Ter no máximo 2 níveis de objetos aninhados. 
+Ex.: /v1/users/addresses/countries
+
+Ao contrário do OAuth1, o OAuth2 permite gerar autenticação para todos os tipos de aplicativos (app móvel nativa, nativo de tablet, 
+aplicação javascript, batch/back-office, etc.) com ou sem o consentimento do proprietário dos recursos.
+OAuth2 é o padrão absoluto para segurança de APIs. Usar outra tecnologia pode atrasar o desenvolvimento e a adoção da sua API.
+Finalmente, a segurança dos recursos é um assunto complexo, e uma solução feita em casa vai provavelmente ter falhas de segurança.
+
+
+
+Mas no mundo RESTful, seria assim:
+
+GET /clients/1
+POST /clients
+PATCH /accounts/1
+PUT /orders/1
+DELETE /addresses/1
+
+
+Por isso, nós recomendamos o plural para 2 tipos de recursos:
+
+Coleções de recursos: /v1/users
+Instância de recurso: /v1/users/007
+Como exemplo, consideramos que POST /v1/users é a chamada para criar um usuário dentro da coleção de usuários. 
+Da mesma forma, GET /v1/users/007 pode ser entendido como “eu quero o usuário 007, da coleção de usuários”.
+
+
+Para URIs, nós recomendamos que seja utilizada, de forma consistente, uma das duas formas a seguir:
+
+spinal-case (destacada na RFC3986)
+e snake_case (mais usada pelos Gigantes da Web)
+Exemplos
+
+POST /v1/specific-orders
+ou
+POST /v1/specific_orders
+
+
+GET  /orders?id_client=007         ou  GET /orders?idClient=007
+POST /orders {"id_client":"007"}   ou  POST /orders {"idClient":"007”}
+
+
+Versionamento
+
+Qualquer API precisa evoluir com o tempo. Existem várias maneiras de versionar uma API:
+
+Por um timestamp, pelo número do release
+No path, no início ou no fim da URI
+Como um parâmetro do request
+Num Header HTTP
+Com um versioning obrigatório ou opcional
+
+
+
+O verbo HTTP GET é usado para ler a coleção. 
+Na prática, a API geralmente não retorna todos os itens da coleção (veja paginação).
+
+
+CURL –X GET \
+-H "Accept: application/json" \
+https://api.fakecompany.com/v1/clients/007/orders
+&lt; 200 OK
+&lt; [{"id":"1234", "state":"paid"}, {"id":"5678", "state":"running"}]
+
+
+O verbo HTTP GET é usado também para ler uma instância em uma coleção.
+
+CURL –X GET \
+-H "Accept: application/json" \
+https://api.fakecompany.com/v1/clients/007/orders/1234
+&lt; 200 OK
+&lt; {"id":"1234", "state":"paid"}
+
+
+
+
+
+---------------
+--REST WEB API
+http://www.linhadecodigo.com.br/artigo/2059/web-services-rest.aspx
+
+
+quatro entidades serão utilizadas: Usuário, Item, Oferta e Avaliação.
+
+
+----------
+/item/{id}/ofertas 
+
+GET
+Coleção de ofertas
+Busca ofertas feitas sobre um item.
+
+POST
+Oferta
+Adiciona oferta a um item
+
+------------
+
+
+http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
+
+These messages can be logically mapped to the /tickets endpoint as follows:
+
+GET /tickets/12/messages - Retrieves list of messages for ticket #12
+GET /tickets/12/messages/5 - Retrieves message #5 for ticket #12
+POST /tickets/12/messages - Creates a new message in ticket #12
+PUT /tickets/12/messages/5 - Updates message #5 for ticket #12
+PATCH /tickets/12/messages/5 - Partially updates message #5 for ticket #12
+DELETE /tickets/12/messages/5 - Deletes message #5 for ticket #12
+
+
+
+
+
+errors in an additional errors field, like so:
+
+
+{
+  "code" : 1024,
+  "message" : "Validation Failed",
+  "errors" : [
+    {
+      "code" : 5432,
+      "field" : "first_name",
+      "message" : "First name cannot have fancy characters"
+    },
+    {
+       "code" : 5622,
+       "field" : "password",
+       "message" : "Password cannot be blank"
+    }
+  ]
+}
+
+
+
+------------------------------------------------------------------
+--
+--Mapeamento de rotas entre endidades pai e filho
+https://azure.microsoft.com/pt-br/documentation/articles/best-practices-api-implementation/
+
+A tabela de roteamento padrão não corresponderá a uma solicitação que faz referência a recursos filho em uma API Web RESTful, 
+como _http://www.adventure-works.com/api/customers/1/orders_ (localize os detalhes de todos os pedidos feitos pelo cliente 1). 
+Para tratar desses casos, você poderá adicionar rotas personalizadas à tabela de roteamento:
+
+
+config.Routes.MapHttpRoute(
+    name: "CustomerOrdersRoute",
+    routeTemplate: "api/customers/{custId}/orders",
+    defaults: new { controller="Customers", action="GetOrdersForCustomer" })
+);
+
+
+Essa rota direciona as solicitações que correspondem ao URI para o método GetOrdersForCustomer no controlador Customers. 
+Este método deve aceitar um parâmetro único chamado custI:
+
+
+
+public class CustomersController : ApiController
+{
+    ...
+    public IEnumerable<Order> GetOrdersForCustomer(int custId)
+    {
+        // Find orders for the specified customer
+        var orders = ...
+        return orders;
+    }
+    ...
+}
+
+
+------------------
+
+public class CustomersController : ApiController
+{
+    ...
+    [Route("api/customers/{id}")]
+    [HttpGet]
+    public Customer FindCustomerByID(int id)
+    {
+        // Find the matching customer
+        var customer = ...
+        return customer;
+    }
+    ...
+    [Route("api/customers/{id}/orders")]
+    [HttpGet]
+    public IEnumerable<Order> FindOrdersForCustomer(int id)
+    {
+        // Find orders for the specified customer
+        var orders = ...
+        return orders;
+    }
+    ...
+}
+
+
+
+--HTTP GET com um número de cliente negativo, a estrutura da API da Web responderá 
+com uma mensagem HTTP 405 (Método Não Permitido):
+
+
+public class CustomersController : ApiController
+{
+    ...
+    [Route("api/customers/{id:int:min(0)}")]     
+    [HttpGet]
+    public Customer FindCustomerByID(int id)
+    {
+        // Find the matching customer
+        var customer = ...
+        return customer;
+    }
+    ...
+}
+
+
+
+
+
+-----------------------------------------------------------------------------
+--
+--Tratamento de error
+--
+http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
+
+http://stackoverflow.com/questions/23196931/returning-ihttpactionresult-vs-ienumerableitem-vs-iqueryableitem
+
+public async Task<IEnumerable<MyItem>> GetMyItems()
+    {
+        //... code ..., var myItems = await ...
+        return myItems;
+    }
+and
+
+    public async Task<IQueryable<MyItem>> GetMyItems()
+    {
+        //... code ..., var myItems = await ...
+        return myItems;
+    }
+and
+
+    public async Task<IHttpActionResult> GetMyItems()
+    {
+        //... code ..., var myItems = await ...
+        return Ok(myItems);
+
+ou should return IHttpActionResult because you can be more specific to the client. 
+You can create more user friendly web applications. Basically you can return different HTML status messages for different situations.
+
+
+
+For example:
+
+public async Task<IHttpActionResult> GetMyItems()
+{
+    if(!authorized)
+        return Unauthorized();
+    if(myItems.Count == 0)
+        return NotFound();
+    //... code ..., var myItems = await ...
+    return Ok(myItems);
+}
+
+
+--------
+
+http://stackoverflow.com/questions/29163827/how-to-return-a-list-of-objects-as-an-ihttpactionresult
+
+
+return Request.CreateResponse<IEnumerable<Question>>(HttpStatusCode.OK, questions);
+
+
+ // GET api/values
+        public IHttpActionResult Get()
+        {
+            return Json<IEnumerable<object>>(QueryExecutor.Instance.ExecuteStoredProcedure("usp_User_GetList"));
+        }      
+    }
+	
+	
+	
+-------------------------------------------------------
+-- IEnumerable para HttpResponseMessage 
+
+https://www.asp.net/web-api/overview/getting-started-with-aspnet-web-api/action-results
+
+
+public HttpResponseMessage Get()
+{
+    // Get a list of products from a database.
+    IEnumerable<Product> products = GetProductsFromDB();
+
+    // Write the list to the response body.
+    HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, products);
+    return response;
+}
+
+
+
+
+-------------------------------------------------------
+
+public IHttpActionResult Get (int id)
+{
+    Product product = _repository.Get (id);
+    if (product == null)
+    {
+        return NotFound(); // Returns a NotFoundResult
+    }
+    return Ok(product);  // Returns an OkNegotiatedContentResult
+}
+
+
+
+
+       [Route("{id}/Teste")]
+        [HttpGet]
+        public HttpResponseMessage GetTeste(int id)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent("Teste de ResponseMessage!");
+            return response;
+        }
+
+		
+       public IEnumerable<dynamic> GetTeste(int id)
+        {
+            HttpResponseMessage response = new HttpResponseMessage();
+            response.Content = new StringContent("Teste de ResponseMessage!");
+            IEnumerable<dynamic> result = null;
+            result = new[] { "teste", "teste2" };
+        
+            return result;
+        }
+
+		
+		
+http://stackoverflow.com/questions/10732644/best-practice-to-return-errors-in-asp-net-web-api
+
+public void Post(Customer customer)
+{
+    if (string.IsNullOrEmpty(customer.Name))
+    {
+        throw new HttpResponseException("Customer Name cannot be empty", HttpStatusCode.BadRequest) 
+    }
+    if (customer.Accounts.Count == 0)
+    {
+         throw new HttpResponseException("Customer does not have any account", HttpStatusCode.BadRequest) 
+    }
+}	
+
+
+
+
+------------------------------------------------------------------------------------------------
+--Content Negotiation in ASP.NET Web API
+--
+https://www.asp.net/web-api/overview/formats-and-model-binding/content-negotiation
+
+
+O principal mecanismo para a negociação de conteúdo http são estes Solicitar cabeçalhos:
+
+Aceitar: Quais tipos de mídia são aceitáveis para a resposta, como "application/json", "application/xml", ou um tipo de meios de comunicação personalizados tais como "application/vnd.example+xml"
+Aceitar-Charset: Quais conjuntos de caracteres são aceitáveis, tais como UTF-8 ou ISO 8859-1.
+Aceitar-codificação: Quais codificações de conteúdo são aceitáveis, tais como gzip.
+Aceitar-idioma: O idioma de preferência natural, tais como "en-nos".
+O servidor também pode olhar para outras partes da solicitação HTTP. Por exemplo, se a solicitação contém um cabeçalho X-solicitado-com, indicando uma solicitação do AJAX, o servidor pode padrão JSON se não há nenhum cabeçalho Accept.
+
+Neste artigo, vamos examinar como a API da Web usa os cabeçalhos Accept e Accept-Charset. (Neste momento, há não há suporte int
+
+--
+---------------------------------
+--
+public Product GetProduct(int id)
+{
+    var item = _products.FirstOrDefault(p => p.ID == id);
+    if (item == null)
+    {
+        throw new HttpResponseException(HttpStatusCode.NotFound);
+    }
+    return item; 
+}
+Um cliente pode enviar este pedido HTTP:
+
+GET http://localhost.:21069/api/products/1 HTTP/1.1
+Host: localhost.:21069
+Accept: application/json, text/javascript, */*; q=0.01
+Em resposta, o servidor pode enviar:
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 57
+Connection: Close
+
+{"Id":1,"Name":"Gizmo","Category":"Widgets","Price":1.99}
+
+
+
+
+public HttpResponseMessage GetProduct(int id)
+{
+    var item = _products.FirstOrDefault(p => p.ID == id);
+    if (item == null)
+    {
+        throw new HttpResponseException(HttpStatusCode.NotFound);
+    }
+    return Request.CreateResponse(HttpStatusCode.OK, product);
+}
+
+
+
+--Formatador
+Accept: text/html,application/xhtml+xml,application/xml
+
+http://www.c-sharpcorner.com/article/formatters-and-content-negotiation-in-asp-net-web-api-2/
+
+Now in WebAPI.config add the following configuration.
+
+GlobalConfiguration.Configuration.Services.Replace(typeof(IContentNegotiator), new CustomContentNegotiator());
+
+
+
+
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/json") { CharSet = "utf-8" });
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/json") { CharSet = "utf-8" });
+
+
+        public static void ConfigureApis(HttpConfiguration config)
+        {
+            config.Formatters.Add(new ProductCsvFormatter());
+        }
+		
+		
+
+
+---
+--Retorno Json
+--
+https://docs.microsoft.com/en-us/aspnet/core/mvc/models/formatting
+
+
+
+// GET: api/authors
+[HttpGet]
+public JsonResult Get()
+{
+    return Json(_authorRepository.List());
+}
+
+
+-----
+
+// GET: api/authors/search?namelike=th
+[HttpGet("Search")]
+public IActionResult Search(string namelike)
+{
+    var result = _authorRepository.GetByNameSubstring(namelike);
+    if (!result.Any())
+    {
+        return NotFound(namelike);
+    }
+    return Ok(result);
+}
+
+
+
+--
+-----------------------------------------------------------------------------------
+--
+
+Dapper
+Asynchronously
+http://www.joesauve.com/async-dapper-and-async-sql-connection-management/
+
+
+--------------------------
+https://github.com/StackExchange/dapper-dot-net/blob/master/Dapper.Tests/Tests.Async.cs
+
+
+dapper-dot-net/Dapper.Tests/Tests.Async.cs
+
+
+data1.Count.IsEqualTo(0);
+
+            row.IsNotNull();
+            row.A.IsEqualTo(123);
+            row.B.IsEqualTo("abc");
+			
+	
+
+--proc	
+var user = cnn.Query<User>("spGetUser", new {Id = 1}, 
+        commandType: CommandType.StoredProcedure).SingleOrDefault();
+		
+
+var result = conn.QueryAsync<ACO_BORDERO>("spGetUser", new { Id = 1 },
+commandType: CommandType.StoredProcedure).SingleOrDefault();
+	
+	
+
+	
+	
+	
+//------------------------------------------------
+--
+----------------------------------------------------------------------------------
+
+--Autenticação OAuth
+Identity4Server
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------
+JSON entre entidades pai e filha
+-----------------------------------
+
+http://stackoverflow.com/questions/31685944/asp-net-webapi-json-response-and-entities-with-foreign-key
+
+
+var json = GlobalConfiguration.Configuration.Formatters.JsonFormatter;
+json.SerializerSettings.PreserveReferencesHandling = 
+    Newtonsoft.Json.PreserveReferencesHandling.All;
+	
+	
+	
+Install-Package Microsoft.AspNet.Odata	
+
+
+
+public class Street
+{
+  public int ID { get; set; }
+  public string Name { get; set; }
+  public int StreetTypeID { get; set; }
+  public virtual StreetType StreetType { get; set; }
+}
+			
+			
+public class StreetType
+{
+  public int ID { get; set; }
+  public string Name { get; set; }
+  public virtual ICollection<Street> Streets { get; set; }
+}
+
+public class StreetTypeMap : EntityTypeConfiguration<StreetType>
+{
+  public StreetTypeMap()
+  {
+     HasKey(t => t.ID);
+     Property(t => t.ID).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+     Property(t => t.Name).IsRequired().HasMaxLength(50);
+     HasMany(a => a.Streets).WithRequired(p => p.StreetType).HasForeignKey(p => p.StreetTypeID);
+     ToTable("StreetType");
+   }
+ }
+
+ 
+and the similar for Street entity. 
+Now I get JSON:
+
+{
+  "id":1,
+  "name":"Street1",
+  "streettypeid":3
+}
+How can I get the JSON like:
+
+{
+  "id":1,
+  "name":"Street1",
+  "streettypeid":
+   {
+    "id":3,
+    "name":"Type3"
+   }
+} 
+
+
+
+
+
+[EnableQuery]
+public virtual IQueryable<T> Get()
+
+http://blablabla/Street?$expand=StreetType
+
+
+
+ [HttpGet, Route("/api/streets/{id:int:min(1)}")]
+    public IHttpActionResult GetYourJsonData(int id)
+    {
+        try
+        {
+            //from your unit of work class
+            return uow.GetEntities<Street>(x => x.ID == id)
+                .FirstOrDefault()
+                .Select(viewModel => new {
+                    ID = viewModel.ID,
+                    Name = viewModel.Name,
+                    StreetTypeID = viewModel.StreetType //consider renaming this to streeytype and not street type id
+                });
+        }
+        catch(Exception)
+        {
+             return InternalServerError();
+        }
+    }
+
+//Edit: in your repo class
+public IEnumerable<T> GetEntities<T>(Func<T, bool> predicate) where T : class
+{
+    return yourContext.Set<T>().Where(predicate);
+}
+
+
+
+------------------------
+--Json
+https://docs.microsoft.com/pt-br/azure/sql-database/sql-database-json-features
+
+
+select CustomerName as Name, PhoneNumber as [Contact.Phone], FaxNumber as [Contact.Fax]
+from Sales.Customers
+where CustomerID = 931
+FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
+
+
+{
+    "Name":"Nada Jovanovic",
+    "Contact":{
+           "Phone":"(215) 555-0100",
+           "Fax":"(215) 555-0101"
+    }
+}
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------			
+--Boas práticas WEB API
+
+http://desenvolvimentoparaweb.com/miscelanea/api-restful-melhores-praticas-parte-1/
+
+
+
+
+
+Como lidar com relacionamentos
+
+Se uma relação só pode existir dentro de outro recurso, os princípios RESTful fornecem orientações úteis. 
+Tomando por base um cenário hipotético, um bilhete consiste em um certo número de mensagens. 
+Estas mensagens podem ser logicamente mapeadas para o endpoint /tickets, como em:
+
+GET /tickets/12/messages Retorna a lista de mensagens do bilhete #12
+--
+GET /tickets/12/messages/5 Retorna a mensagem #5 do bilhete #12
+---
+POST /tickets/12/messages Cria uma nova mensagem no bilhete #12
+PUT /tickets/12/messages/5 Atualiza a mensagem #5 do bilhete #12
+PATCH /tickets/12/messages/5 Atualiza parcialmente a mensagem #5 do bilhete #12
+DELETE /tickets/12/messages/5 Apaga a mensagem #5 do bilhete #12
+Alternativamente, se uma relação pode existir independentemente do recurso, faz sentido apenas incluir um identificador dentro do retorno; 
+o consumidor da API, então, teria que acessar o endpoint da relação. 
+No entanto, se a relação é comumente solicitada ao lado do recurso, o API poderia oferecer funcionalidade para incorporar automaticamente 
+a representação da relação e evitar um segundo hit na API.
+
+
+
+
+https://github.com/yiisoft/yii2/issues/4873
+
+['pattern' => 'v2/<parentResource:[\w]+>/<parentResourceId:[\w-]+>/items/<id:[\w-]+>', 'route' => 'v2/item/view', 'verb' => 'GET'],
+                ['pattern' => 'v2/<parentResource:[\w]+>/<parentResourceId:[\w-]+>/items/<id:[\w-]+>', 'route' => 'v2/item/update', 'verb' => 'PUT'],
+                ['pattern' => 'v2/<parentResource:[\w]+>/<parentResourceId:[\w-]+>/items/<id:[\w-]+>', 'route' => 'v2/item/delete', 'verb' => 'DELETE'],
+                ['pattern' => 'v2/<parentResource:[\w]+>/<parentResourceId:[\w-]+>/items', 'route' => 'v2/item/index', 'verb' => 'GET'],
+                ['pattern' => 'v2/<parentResource:[\w]+>/<parentResourceId:[\w-]+>/items', 'route' => 'v2/item/create', 'verb' => 'POST'],
+
+
+	
+	
+--			
+--------------------------------------------------------------------
+-- Consumo API
+https://www.w3.org/TR/cors/
+
+
+
+Using XMLHttpRequest a client-side Web application on http://hello-world.example can access this resource as follows:
+
+var client = new XMLHttpRequest()
+client.open("GET", "http://example.com/hello")
+client.onreadystatechange = function() { /* do something */ }
+client.send()
+
+
+
+http://stackoverflow.com/questions/37234127/can-we-use-microsoft-aspnet-webapi-client-from-an-asp-net-core-application
+
+
+
+http://stackoverflow.com/questions/24131067/deserialize-json-to-array-or-list-with-httpclient-readasasync-using-net-4-0-ta
+
+
+
+
+public class Job
+{
+        public string id { get; set; }
+        public string position_title { get; set; }
+        public string organization_name { get; set; }
+        public string rate_interval_code { get; set; }
+        public int minimum { get; set; }
+        public int maximum { get; set; }
+        public string start_date { get; set; }
+        public string end_date { get; set; }
+        public List<string> locations { get; set; }
+        public string url { get; set; }
+}
+
+
+
+
+ List<Job> model = null;
+        var client = new HttpClient();
+        var task = client.GetAsync("http://api.usa.gov/jobs/search.json?query=nursing+jobs")
+          .ContinueWith((taskwithresponse) =>
+          {
+              var response = taskwithresponse.Result;
+              var jsonString = response.Content.ReadAsStringAsync();
+              jsonString.Wait();
+              model = JsonConvert.DeserializeObject<List<Job>>(jsonString.Result);
+
+          });
+        task.Wait();
+
+
+
+
+--		
+-------------------------------------------------------------------	
+--				
+--		
+--Configuração de Ambiente
+--
+
+https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments
+--
+
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:40088/",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "IIS Express (Staging)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Staging"
+      }
+    }
+  }
+}
+
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    if (env.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
+        app.UseDatabaseErrorPage();
+        app.UseBrowserLink();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Home/Error");
+    }
+	
+	
+--	
+--------------------
+--
+webforms
+https://msdn.microsoft.com/pt-br/library/system.web.ui.scriptmanager(v=vs.110).aspx
+
+System.Web.UI.Control
+System.Web.UI.ScriptManager
+	
+	
+                ScriptManager.RegisterClientScriptBlock(
+                Page,
+                Page.GetType(),
+                "mensagem",
+                "Aviso()",
+                 true);
+
+
+
+				 
+	
+	
+
+--
+https://modernizr.com/
+
+
+
+
+
+		
+--		
+-------------------------------------------------------------------	
+--				
+--		
+-------------------------------------------------------------------	
+--				
+
+
+Estudo
+---------------------------------
+				
+.NET CORE
+ASP.NET Core
+				
+https://docs.microsoft.com/pt-br/dotnet/core/	
+
+
+Principais diferenças entre o .NET Core e o .NET Framework: 
+
+
+
+https://docs.microsoft.com/pt-br/dotnet/core/tutorials/library-with-visual-studio
+
+https://docs.microsoft.com/pt-br/dotnet/core/tutorials/testing-library-with-visual-studio?tabs=csharp
+
+
+--
+https://docs.microsoft.com/pt-br/dotnet/core/tutorials/testing-library-with-visual-studio?tabs=csharp
+
+
+
+--Distribuindo a biblioteca em um pacote do NuGet
+
+Command Prompt
+
+Documentos\Visual Studio 2017\Projects\ClassLibraryProjects\StringLibrary.
+
+dotnet pack --no-build
+
+O utilitário dotnet gera um pacote com uma extensão .nupkg.
+
+
+
+----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+			
